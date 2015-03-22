@@ -13,10 +13,11 @@ $worker->name = 'VMStatWorker';
 // 进程启动时，开启一个vmstat进程，并广播vmstat进程的输出给所有浏览器客户端
 $worker->onWorkerStart = function($worker)
 {
-    $process_handle = popen('vmstat 1', 'r');
-    if($process_handle)
+    // 把进程句柄存储起来，在进程关闭的时候关闭句柄
+    $worker->process_handle = popen('vmstat 1', 'r');
+    if($worker->process_handle)
     {
-        $process_connection = new TcpConnection($process_handle);
+        $process_connection = new TcpConnection($worker->process_handle);
         $process_connection->onMessage = function($process_connection, $data)use($worker)
         {
             foreach($worker->connections as $connection)
@@ -25,7 +26,27 @@ $worker->onWorkerStart = function($worker)
             }
         };
     }
+    else
+    {
+       echo "vmstat 1 fail\n";
+    }
 };
+
+// 进程关闭时
+$worker->onWorkerStop = function($worker)
+{
+    @pclose($worker->process_handle);
+};
+
+$worker->onConnect = function($connection)
+{
+    $connection->onWebSocketConnect = function($connection)
+    {   
+        $connection->send("procs -----------memory---------- ---swap-- -----io---- -system-- ----cpu----\n");
+        $connection->send("r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa\n");
+    };
+};
+
 // 浏览器发来消息时什么也不做
 $worker->onMessage = function($connection, $data)
 {
