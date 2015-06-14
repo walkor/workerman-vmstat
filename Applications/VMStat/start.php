@@ -52,11 +52,8 @@ $worker->onWorkerStop = function($worker)
 
 $worker->onConnect = function($connection)
 {
-    $connection->onWebSocketConnect = function($connection)
-    {   
-        $connection->send("procs -----------memory---------- ---swap-- -----io---- -system-- ----cpu----\n");
-        $connection->send("r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa\n");
-    };
+    $connection->send("procs -----------memory---------- ---swap-- -----io---- -system-- ----cpu----\n");
+    $connection->send("r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa\n");
 };
 
 // 浏览器发来消息时什么也不做
