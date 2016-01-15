@@ -57,12 +57,6 @@ $worker->onConnect = function($connection)
     $connection->send("r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa\n");
 };
 
-// 浏览器发来消息时什么也不做
-$worker->onMessage = function($connection, $data)
-{
-    // 浏览器发来消息什么也不做
-};
-
 // WebServer，用来给浏览器吐html js css
 $web = new WebServer("http://0.0.0.0:55555");
 // WebServer数量
