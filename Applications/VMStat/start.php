@@ -47,6 +47,7 @@ $worker->onWorkerStart = function($worker)
 // 进程关闭时
 $worker->onWorkerStop = function($worker)
 {
+    @shell_exec('killall vmstat');
     @pclose($worker->process_handle);
 };
 
