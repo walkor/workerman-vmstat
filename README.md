@@ -1,5 +1,5 @@
 # workerman-vmstat
-在浏览器里面显示以更友好的方式显示vmstats信息，包括内存、cpu、IO等信息。  
+在浏览器里面显示以更友好的方式显示vmstat信息，包括内存、cpu、IO等信息。（不支持windows系统）  
 
 ![vmstat](https://github.com/walkor/workerman-vmstat/blob/master/Applications/VMStat/Web/img/vmstat.png?raw=true)
 
