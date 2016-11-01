@@ -1,7 +1,13 @@
 # workerman-vmstat
 在浏览器里面显示以更友好的方式显示vmstat信息，包括内存、cpu、IO等信息。（不支持windows系统）  
 
-![vmstat](https://github.com/walkor/workerman-vmstat/blob/master/Applications/VMStat/Web/img/vmstat.png?raw=true)
+![vmstat](https://github.com/walkor/workerman-vmstat/blob/master/Web/img/vmstat.png?raw=true)
+
+## 安装
+
+1、```git clone https://github.com/walkor/workerman-vmstat```
+
+2、``` composer install ```
 
 ## 线上demo
 [http://www.workerman.net/demos/vmstat/](http://www.workerman.net/demos/vmstat/)
