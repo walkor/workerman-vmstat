@@ -12,8 +12,9 @@
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
 use \Workerman\Worker;
-use \Workerman\WebServer;
-use \Workerman\Connection\TcpConnection;
+use Workerman\Protocols\Http\Request;
+use Workerman\Protocols\Http\Response;
+use Workerman\Connection\TcpConnection;
 
 // #### 一个web界面的vmstat工具 ####
 
@@ -58,11 +59,57 @@ $worker->onConnect = function($connection)
 };
 
 // WebServer，用来给浏览器吐html js css
-$web = new WebServer("http://0.0.0.0:55555");
+$web = new Worker("http://0.0.0.0:55555");
 // WebServer数量
 $web->count = 2;
-// 设置站点根目录
-$web->addRoot('www.your_domain.com', __DIR__.'/Web');
+
+$web->name = 'web';
+
+define('WEBROOT', __DIR__ . '/Web');
+
+$web->onMessage = function (TcpConnection $connection, Request $request) {
+    $path = $request->path();
+    if ($path === '/') {
+        $connection->send(exec_php_file(WEBROOT.'/index.php'));
+        return;
+    }
+    $file = realpath(WEBROOT. $path);
+    if (false === $file) {
+        $connection->send(new Response(404, array(), '<h3>404 Not Found</h3>'));
+        return;
+    }
+    // Security check! Very important!!!
+    if (strpos($file, WEBROOT) !== 0) {
+        $connection->send(new Response(400));
+        return;
+    }
+    if (\pathinfo($file, PATHINFO_EXTENSION) === 'php') {
+        $connection->send(exec_php_file($file));
+        return;
+    }
+
+    if (!empty($if_modified_since = $request->header('if-modified-since'))) {
+        // Check 304.
+        $info = \stat($file);
+        $modified_time = $info ? \date('D, d M Y H:i:s', $info['mtime']) . ' ' . \date_default_timezone_get() : '';
+        if ($modified_time === $if_modified_since) {
+            $connection->send(new Response(304));
+            return;
+        }
+    }
+    $connection->send((new Response())->withFile($file));
+};
+
+function exec_php_file($file) {
+    \ob_start();
+    // Try to include php file.
+    try {
+        include $file;
+    } catch (\Exception $e) {
+        echo $e;
+    }
+    return \ob_get_clean();
+}
 
 
 // 如果不是在根目录启动，则运行runAll方法
