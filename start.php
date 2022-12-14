@@ -27,7 +27,7 @@ $worker->name = 'VMStatWorker';
 $worker->onWorkerStart = function($worker)
 {
     // 把进程句柄存储起来，在进程关闭的时候关闭句柄
-    $worker->process_handle = popen('vmstat 1', 'r');
+    $worker->process_handle = popen('vmstat 1 -n', 'r');
     if($worker->process_handle)
     {
         $process_connection = new TcpConnection($worker->process_handle);
